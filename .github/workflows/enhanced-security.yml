@@ -11,6 +11,11 @@ on:
     # Run security scan every Monday at 2 AM UTC
     - cron: "0 2 * * 1"
 
+permissions:
+  contents: read
+  security-events: write
+  actions: read
+
 env:
   JAVA_VERSION: "17"
   MAVEN_OPTS: "-Xmx1024m"
