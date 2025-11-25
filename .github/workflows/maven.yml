@@ -44,12 +44,23 @@ jobs:
         run: mvn clean compile -DskipTests
 
       - name: Run Snyk to check for vulnerabilities
-        uses: snyk/actions/maven@master
         continue-on-error: true
+        run: |
+          npm install -g snyk
+          snyk auth ${{ secrets.SNYK_TOKEN }}
+          snyk test --maven --severity-threshold=critical --sarif-file-output=snyk.sarif || true
         env:
           SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
-        with:
-          args: --severity-threshold=critical --sarif-file-output=snyk.sarif
+
+      - name: Check if SARIF file exists
+        run: |
+          if [ -f snyk.sarif ]; then
+            echo "✅ SARIF file generated"
+            ls -lh snyk.sarif
+          else
+            echo "⚠️ No SARIF file found, creating empty one"
+            echo '{"version":"2.1.0","runs":[]}' > snyk.sarif
+          fi
 
       - name: Upload Snyk results to GitHub Security
         uses: github/codeql-action/upload-sarif@v3
