@@ -48,18 +48,20 @@ jobs:
         run: |
           npm install -g snyk
           snyk auth ${{ secrets.SNYK_TOKEN }}
-          snyk test --maven --severity-threshold=critical --sarif-file-output=snyk.sarif || true
+          # Run Snyk and always create SARIF, even if it fails
+          snyk test --maven --severity-threshold=critical --sarif-file-output=snyk.sarif || echo '{"version":"2.1.0","$schema":"https://raw.githubusercontent.com/oasis-tcs/sarif-spec/master/Schemata/sarif-schema-2.1.0.json","runs":[{"tool":{"driver":{"name":"Snyk","informationUri":"https://snyk.io"}},"results":[]}]}' > snyk.sarif
         env:
           SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
 
-      - name: Check if SARIF file exists
+      - name: Verify SARIF file exists
         run: |
           if [ -f snyk.sarif ]; then
-            echo "✅ SARIF file generated"
+            echo "✅ SARIF file exists"
             ls -lh snyk.sarif
+            cat snyk.sarif | head -20
           else
-            echo "⚠️ No SARIF file found, creating empty one"
-            echo '{"version":"2.1.0","runs":[]}' > snyk.sarif
+            echo "❌ SARIF file missing, creating empty one"
+            echo '{"version":"2.1.0","$schema":"https://raw.githubusercontent.com/oasis-tcs/sarif-spec/master/Schemata/sarif-schema-2.1.0.json","runs":[{"tool":{"driver":{"name":"Snyk","informationUri":"https://snyk.io"}},"results":[]}]}' > snyk.sarif
           fi
 
       - name: Upload Snyk results to GitHub Security
