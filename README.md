@@ -40,6 +40,19 @@ This project demonstrates the integration of Static Application Security Testing
 
 ### Results
 
+#### Workflow Execution
+
+![GitHub Actions Workflow Success](/figure/github%20action.png)
+
+**Successful Pipeline Execution:**
+
+- ✅ Build and Test: 20 seconds
+- ✅ Security Scan: 46 seconds
+- ⏱️ Total Duration: 1m 13s
+- 📊 Status: All jobs passing
+
+_Screenshot Evidence: Actions tab showing successful workflow run with commit 4caf438_
+
 #### Vulnerability Detection
 
 - **Total Alerts**: 9 vulnerabilities identified
