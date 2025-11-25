@@ -2,3 +2,4 @@
 
 PRACTICAL 4: INTEGRATING SNYK WITH GITHUB ACTIONS# cicd-demo-swe302-p4a
 Testing SNYK_TOKEN
+ci: verify Snyk run
