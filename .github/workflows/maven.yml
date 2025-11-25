@@ -48,8 +48,8 @@ jobs:
         run: |
           npm install -g snyk
           snyk auth ${{ secrets.SNYK_TOKEN }}
-          # Run Snyk and always create SARIF, even if it fails
-          snyk test --maven --severity-threshold=critical --sarif-file-output=snyk.sarif || echo '{"version":"2.1.0","$schema":"https://raw.githubusercontent.com/oasis-tcs/sarif-spec/master/Schemata/sarif-schema-2.1.0.json","runs":[{"tool":{"driver":{"name":"Snyk","informationUri":"https://snyk.io"}},"results":[]}]}' > snyk.sarif
+          # Run Snyk - it will create SARIF even when vulnerabilities are found
+          snyk test --maven --sarif-file-output=snyk.sarif || true
         env:
           SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
 
@@ -58,9 +58,10 @@ jobs:
           if [ -f snyk.sarif ]; then
             echo "✅ SARIF file exists"
             ls -lh snyk.sarif
-            cat snyk.sarif | head -20
+            echo "First 30 lines of SARIF:"
+            cat snyk.sarif | head -30
           else
-            echo "❌ SARIF file missing, creating empty one"
+            echo "⚠️ No SARIF file found, creating empty one"
             echo '{"version":"2.1.0","$schema":"https://raw.githubusercontent.com/oasis-tcs/sarif-spec/master/Schemata/sarif-schema-2.1.0.json","runs":[{"tool":{"driver":{"name":"Snyk","informationUri":"https://snyk.io"}},"results":[]}]}' > snyk.sarif
           fi
 
